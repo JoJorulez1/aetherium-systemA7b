@@ -289,7 +289,6 @@
         }
         .gm-key:hover { color: var(--gm); }
 
-        /* TOAST NOTIFICATION */
         #toast {
             position: fixed;
             top: 20px;
@@ -399,7 +398,6 @@
         .stat-card.coins .stat-value { color: #f59e0b; }
         .stat-card.level .stat-value { color: var(--neon); text-shadow: var(--neon-glow); }
 
-        /* AP Controls */
         .ap-controls {
             display: flex;
             gap: 6px;
@@ -424,7 +422,6 @@
         .ap-btn.restore { border-color: rgba(34,197,94,0.3); color: rgba(34,197,94,0.7); }
         .ap-btn.restore:hover { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.05); }
 
-        /* Inventory */
         .inv-header {
             display: flex;
             justify-content: space-between;
@@ -468,7 +465,6 @@
         }
         .inv-slot:hover .del-slot { display: block; }
 
-        /* Powers & Techniques */
         .power-list { display: flex; flex-direction: column; gap: 8px; }
         .power-item {
             background: rgba(0,0,0,0.3);
@@ -509,7 +505,6 @@
             letter-spacing: 1px;
         }
 
-        /* GM */
         #gm { animation: fadeUp 0.4s ease; }
 
         .gm-header {
@@ -534,7 +529,6 @@
         .dispenser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .dispenser-grid input { margin-bottom: 0; }
 
-        /* GM Inventory Editor */
         .gm-inv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
         .gm-inv-input { margin-bottom: 0 !important; font-size: 0.8rem !important; padding: 8px 10px !important; }
 
@@ -565,7 +559,6 @@
 </head>
 <body>
 
-<!-- TOAST -->
 <div id="toast">⚡ <span id="toast-msg"></span></div>
 
 <div class="frame">
@@ -601,7 +594,6 @@
             <div id="t-lore" class="tab" onclick="switchTab('lore')">Lore</div>
         </div>
 
-        <!-- STATUS TAB -->
         <div id="view-status">
             <div class="bar-label-row">
                 <span class="label">AP · Action Points</span>
@@ -638,32 +630,25 @@
             <div id="disp-inv"></div>
         </div>
 
-        <!-- POWERS TAB -->
         <div id="view-powers" class="hidden">
             <div style="margin-bottom:20px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span class="label" style="margin:0;">Abilities</span>
-                </div>
+                <span class="label">Abilities</span>
                 <div class="power-list" id="powers-list"></div>
                 <div class="add-row">
-                    <input id="new-power" placeholder="Add power or ability..." style="margin-bottom:0;">
+                    <input id="new-power" placeholder="Add power...">
                     <button class="btn btn-sm" onclick="addPower()">ADD</button>
                 </div>
             </div>
-
             <div style="border-top:1px solid var(--border); padding-top:20px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span class="label" style="margin:0; color:var(--gm);">Techniques</span>
-                </div>
+                <span class="label" style="color:var(--gm);">Techniques</span>
                 <div class="power-list" id="techs-list"></div>
                 <div class="add-row">
-                    <input id="new-tech" placeholder="Add technique..." style="margin-bottom:0;">
+                    <input id="new-tech" placeholder="Add technique...">
                     <button class="btn btn-sm btn-gm" onclick="addTech()">ADD</button>
                 </div>
             </div>
         </div>
 
-        <!-- LORE TAB -->
         <div id="view-lore" class="hidden">
             <div class="archive-scroll" id="archive-list"></div>
         </div>
@@ -701,7 +686,7 @@
 
         <div class="gm-section">
             <div class="gm-section-title">Balance Dispenser</div>
-            <input id="rew-id" placeholder="Player ID" style="margin-bottom:8px;">
+            <input id="rew-id" placeholder="Player ID">
             <div class="dispenser-grid">
                 <input id="rew-c" placeholder="+ Coins">
                 <input id="rew-x" placeholder="+ XP">
@@ -711,7 +696,7 @@
 
         <div class="gm-section">
             <div class="gm-section-title">Inventory Editor</div>
-            <input id="inv-player-id" placeholder="Player ID" style="margin-bottom:8px;">
+            <input id="inv-player-id" placeholder="Player ID">
             <div id="gm-inv-slots" class="gm-inv-grid"></div>
             <div style="display:flex; gap:6px; margin-top:8px;">
                 <button class="btn btn-sm btn-gm" onclick="loadGMInv()">LOAD</button>
@@ -720,15 +705,9 @@
         </div>
 
         <div class="gm-section">
-            <div class="gm-section-title">Broadcast Notification</div>
-            <input id="broadcast-msg" placeholder="Message to all players...">
-            <button class="btn btn-gm" onclick="broadcastMsg()">BROADCAST</button>
-        </div>
-
-        <div class="gm-section">
             <div class="gm-section-title">Change GM Password</div>
-            <input id="gm-old-pass" type="password" placeholder="Current password" style="margin-bottom:8px;">
-            <input id="gm-new-pass" type="password" placeholder="New password" style="margin-bottom:8px;">
+            <input id="gm-old-pass" type="password" placeholder="Current password">
+            <input id="gm-new-pass" type="password" placeholder="New password">
             <input id="gm-new-pass2" type="password" placeholder="Confirm new password">
             <button class="btn btn-gm" onclick="changeGMPassword()">UPDATE PASSWORD</button>
         </div>
@@ -749,7 +728,6 @@
     let pendingLoreDraft = "";
     let broadcastListener = null;
 
-    // ─── TOAST ───────────────────────────────────────────
     function toast(msg, isGM = false) {
         const el = document.getElementById('toast');
         const msgEl = document.getElementById('toast-msg');
@@ -759,7 +737,6 @@
         el._t = setTimeout(() => el.className = isGM ? 'gm-toast' : '', 3000);
     }
 
-    // ─── AUTH ─────────────────────────────────────────────
     function sync() {
         const id = document.getElementById('user-id').value.trim();
         if (!id) return;
@@ -772,13 +749,12 @@
                 const newPlayerData = {
                     lvl: 1, exp: 0, coins: 0,
                     ap: 100, maxAp: 100,
-                    inventory: [],
-                    powers: [], techniques: []
+                    inventory: [], powers: [], techniques: []
                 };
                 playerRef.set(newPlayerData).then(() => {
                     currentID = id;
                     startListener(id);
-                    toast("Unit " + id + " linked to system");
+                    toast("Unit " + id + " linked");
                 });
             }
         });
@@ -786,146 +762,103 @@
         db.ref('worldData/lore').on('value', snap => {
             const list = document.getElementById('archive-list');
             list.innerHTML = '';
-            if (!snap.exists()) { list.innerHTML = '<div class="empty-state">NO LORE ENTRIES YET</div>'; return; }
+            if (!snap.exists()) { list.innerHTML = '<div class="empty-state">NO LORE ENTRIES</div>'; return; }
             snap.forEach(entry => {
                 const data = entry.val();
                 list.innerHTML += `<div class="lore-entry"><div class="lore-meta">${data.date}</div><div class="lore-text">${data.text}</div></div>`;
             });
         });
-
         loadGMTable();
-        listenBroadcast(id);
     }
 
     function startListener(id) {
         db.ref('players/' + id).on('value', snap => {
-            updateUI(snap.val());
-            document.getElementById('auth').classList.add('hidden');
-            document.getElementById('dash').classList.remove('hidden');
+            if(snap.exists()) {
+                updateUI(snap.val());
+                document.getElementById('auth').classList.add('hidden');
+                document.getElementById('dash').classList.remove('hidden');
+            }
         });
     }
 
     function logout() {
-        if (broadcastListener) { db.ref('worldData/broadcast').off('value', broadcastListener); broadcastListener = null; }
         db.ref('players/' + currentID).off();
-        db.ref('worldData/lore').off();
         currentID = "";
-        document.getElementById('user-id').value = '';
         document.getElementById('dash').classList.add('hidden');
         document.getElementById('auth').classList.remove('hidden');
-        switchTab('status');
         toast("Unit disconnected");
     }
 
-    // ─── UI UPDATE ────────────────────────────────────────
     function updateUI(data) {
         document.getElementById('disp-name').innerText = currentID.toUpperCase();
         document.getElementById('disp-lvl').innerText = data.lvl;
         document.getElementById('disp-coins').innerText = data.coins;
-
         const maxAp = data.maxAp || 100;
         const ap = data.ap !== undefined ? data.ap : 100;
         document.getElementById('bar-ap').style.width = (ap / maxAp * 100) + "%";
         document.getElementById('ap-val').innerText = `${ap} / ${maxAp}`;
-
         const req = Math.floor(100 * Math.pow(1.2, data.lvl - 1));
         document.getElementById('bar-xp').style.width = (data.exp / req * 100) + "%";
         document.getElementById('xp-val').innerText = `${Math.floor(data.exp)} / ${req}`;
 
-        // Inventory
         const inv = document.getElementById('disp-inv');
         inv.innerHTML = '';
         const items = data.inventory || [];
         items.forEach((item, i) => {
-            if (item === '' || item === null) {
-                inv.innerHTML += `<div class="inv-slot empty" onclick="editSlot(${i})"></div>`;
-            } else {
-                inv.innerHTML += `<div class="inv-slot" onclick="editSlot(${i})">${item}<span class="del-slot" onclick="event.stopPropagation(); deleteSlot(${i})">✕</span></div>`;
-            }
+            if (!item) inv.innerHTML += `<div class="inv-slot empty" onclick="editSlot(${i})"></div>`;
+            else inv.innerHTML += `<div class="inv-slot" onclick="editSlot(${i})">${item}<span class="del-slot" onclick="event.stopPropagation(); deleteSlot(${i})">✕</span></div>`;
         });
-        if (items.length < 16) {
-            inv.innerHTML += `<div class="inv-slot empty" onclick="addInvSlot()"></div>`;
-        }
+        if (items.length < 16) inv.innerHTML += `<div class="inv-slot empty" onclick="addInvSlot()"></div>`;
 
-        // Powers
         const pList = document.getElementById('powers-list');
         pList.innerHTML = '';
         (data.powers || []).forEach((p, i) => {
             pList.innerHTML += `<div class="power-item"><span>${p}</span><span class="del-btn" onclick="deletePower(${i})">✕</span></div>`;
         });
-        if (!(data.powers || []).length) pList.innerHTML = '<div class="empty-state">NO POWERS REGISTERED</div>';
-
         const tList = document.getElementById('techs-list');
         tList.innerHTML = '';
         (data.techniques || []).forEach((t, i) => {
             tList.innerHTML += `<div class="power-item technique"><span>${t}</span><span class="del-btn" onclick="deleteTech(${i})">✕</span></div>`;
         });
-        if (!(data.techniques || []).length) tList.innerHTML = '<div class="empty-state">NO TECHNIQUES REGISTERED</div>';
     }
 
-    // ─── AP CONTROLS ──────────────────────────────────────
     function spendAP(amount) {
         db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.ap = Math.max(0, (p.ap || 0) - amount); }
+            if (p) p.ap = Math.max(0, (p.ap || 0) - amount);
             return p;
-        }, (err, committed) => {
-            if (committed) toast(`- ${amount} AP spent`);
         });
     }
 
     function restoreAP() {
         db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.ap = p.maxAp || 100; }
+            if (p) p.ap = p.maxAp || 100;
             return p;
-        }, (err, committed) => {
-            if (committed) toast("AP fully restored");
         });
     }
 
-    // ─── INVENTORY ────────────────────────────────────────
     function addInvSlot() {
-        const name = prompt("Item name (or leave empty for blank slot):");
+        const name = prompt("Item name:");
         if (name === null) return;
         db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.inventory = p.inventory || []; p.inventory.push(name || ''); }
+            if (p) { p.inventory = p.inventory || []; p.inventory.push(name); }
             return p;
-        }, (err, committed) => { if (committed) toast("Inventory updated"); });
-    }
-
-    function editSlot(index) {
-        db.ref('players/' + currentID + '/inventory/' + index).once('value', snap => {
-            const current = snap.val() || '';
-            const newVal = prompt("Edit item:", current);
-            if (newVal === null) return;
-            db.ref('players/' + currentID + '/inventory/' + index).set(newVal)
-                .then(() => toast("Item updated"));
         });
     }
 
-    function deleteSlot(index) {
+    function deleteSlot(i) {
         db.ref('players/' + currentID).transaction(p => {
-            if (p && p.inventory) { p.inventory.splice(index, 1); }
+            if (p && p.inventory) p.inventory.splice(i, 1);
             return p;
-        }, (err, committed) => { if (committed) toast("Item removed"); });
+        });
     }
 
-    // ─── POWERS & TECHNIQUES ─────────────────────────────
     function addPower() {
         const val = document.getElementById('new-power').value.trim();
         if (!val) return;
         db.ref('players/' + currentID).transaction(p => {
             if (p) { p.powers = p.powers || []; p.powers.push(val); }
             return p;
-        }, (err, committed) => {
-            if (committed) { document.getElementById('new-power').value = ''; toast("Power registered"); }
-        });
-    }
-
-    function deletePower(index) {
-        db.ref('players/' + currentID).transaction(p => {
-            if (p && p.powers) { p.powers.splice(index, 1); }
-            return p;
-        }, (err, committed) => { if (committed) toast("Power removed"); });
+        }, () => document.getElementById('new-power').value = '');
     }
 
     function addTech() {
@@ -934,163 +867,76 @@
         db.ref('players/' + currentID).transaction(p => {
             if (p) { p.techniques = p.techniques || []; p.techniques.push(val); }
             return p;
-        }, (err, committed) => {
-            if (committed) { document.getElementById('new-tech').value = ''; toast("Technique added"); }
-        });
+        }, () => document.getElementById('new-tech').value = '');
     }
 
-    function deleteTech(index) {
-        db.ref('players/' + currentID).transaction(p => {
-            if (p && p.techniques) { p.techniques.splice(index, 1); }
-            return p;
-        }, (err, committed) => { if (committed) toast("Technique removed"); });
-    }
-
-    // ─── BROADCAST LISTENER ──────────────────────────────
-    function listenBroadcast(id) {
-        let firstLoad = true;
-        broadcastListener = db.ref('worldData/broadcast').on('value', snap => {
-            if (firstLoad) { firstLoad = false; return; }
-            if (snap.exists()) {
-                const data = snap.val();
-                toast("📢 GM: " + data.msg, true);
-            }
-        });
-    }
-
-    // ─── GM TABLE ─────────────────────────────────────────
     function loadGMTable() {
-        const tbody = document.getElementById('unit-table-body');
         db.ref('players').on('value', snap => {
+            const tbody = document.getElementById('unit-table-body');
             tbody.innerHTML = "";
             snap.forEach(child => {
                 const p = child.val();
-                tbody.innerHTML += `<tr><td>${child.key}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap !== undefined ? p.ap : 100}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${child.key}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap || 100}</td></tr>`;
             });
         });
     }
 
-    // ─── AI ───────────────────────────────────────────────
     async function aiAction() {
-        const apiKey = document.getElementById('openrouter-key').value;
+        const key = document.getElementById('openrouter-key').value;
         const input = document.getElementById('gm-input').value;
         const chat = document.getElementById('ai-convo');
-        if (!apiKey) { alert("OpenRouter API Key Required."); return; }
-        if (!input) return;
+        if (!key || !input) return;
         chat.innerHTML += `<div class="gm-msg">> ${input}</div>`;
-        chat.innerHTML += `<div class="ai-msg" id="ai-thinking" style="opacity:0.5;">System Architect is thinking...</div>`;
-        chat.scrollTop = chat.scrollHeight;
         try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + apiKey,
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "https://jojorulez1.github.io",
-                    "X-Title": "Aetherium"
-                },
+                headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    max_tokens: 2000,
                     model: "openrouter/free",
-                    messages: [
-                        {
-                            role: "system",
-                            content: "You are the System Architect of Aetherium, a fantasy tower-climbing RPG. Help the GM manage quests, summarize lore, calculate rewards using XP formula (100 * 1.2^(level-1)), and balance encounters. Be concise and thematic."
-                        },
-                        {
-                            role: "user",
-                            content: input
-                        }
-                    ]
+                    messages: [{role: "system", content: "You are the System Architect of Aetherium tower RPG."}, {role: "user", content: input}]
                 })
             });
-            const data = await response.json();
-            if (!response.ok) {
-                document.getElementById('ai-thinking')?.remove();
-                chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">API Error ${response.status}: ${JSON.stringify(data)}</div>`;
-                return;
-            }
+            const data = await res.json();
             const aiText = data.choices[0].message.content;
-            const modelUsed = data.model || "unknown model";
-            document.getElementById('ai-thinking')?.remove();
-            pendingLoreDraft = aiText;
-            chat.innerHTML += `<div class="ai-msg">${aiText}<br><br><span style="font-size:0.6rem; opacity:0.4;">via ${modelUsed}</span><br><button class="btn btn-gm btn-push" onclick="finalizeQuest()">Push to Lore Archive</button></div>`;
-        } catch (e) {
-            document.getElementById('ai-thinking')?.remove();
-            chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">Link Failed: ${e.message || JSON.stringify(e)}</div>`;
-        }
+            chat.innerHTML += `<div class="ai-msg">${aiText}<br><button class="btn btn-gm btn-push" onclick="finalizeQuest('${aiText.replace(/'/g, "\\'").replace(/\n/g, " ")}')">Archive Lore</button></div>`;
+        } catch (e) { chat.innerHTML += `<div class="ai-msg" style="color:red;">Error: ${e.message}</div>`; }
         document.getElementById('gm-input').value = '';
-        chat.scrollTop = chat.scrollHeight;
     }
 
-    function finalizeQuest() {
-        if (!pendingLoreDraft) return;
-        db.ref('worldData/lore').push({ text: pendingLoreDraft, date: new Date().toLocaleDateString() });
-        toast("Lore synced to archive", true);
-        pendingLoreDraft = "";
+    function finalizeQuest(txt) {
+        db.ref('worldData/lore').push({ text: txt, date: new Date().toLocaleDateString() });
+        toast("Lore archived", true);
     }
 
-    // ─── DISPENSER ────────────────────────────────────────
     function dispense() {
         const id = document.getElementById('rew-id').value;
         const c = parseInt(document.getElementById('rew-c').value) || 0;
         const x = parseInt(document.getElementById('rew-x').value) || 0;
-        if (!id) { alert("Enter Player ID"); return; }
         db.ref('players/' + id).transaction(p => {
             if (p) {
-                p.coins += c;
-                p.exp += x;
+                p.coins += c; p.exp += x;
                 let req = Math.floor(100 * Math.pow(1.2, p.lvl - 1));
                 while (p.exp >= req) { p.exp -= req; p.lvl++; req = Math.floor(100 * Math.pow(1.2, p.lvl - 1)); }
             } return p;
-        }, (error, committed, snapshot) => {
-            if (committed) {
-                const data = snapshot.val();
-                toast(`${id} updated → LVL ${data.lvl}`, true);
-                document.getElementById('rew-c').value = "";
-                document.getElementById('rew-x').value = "";
-            } else { alert("❌ Update Failed: ID not found."); }
         });
     }
 
-    // ─── GM INVENTORY EDITOR ─────────────────────────────
     function loadGMInv() {
-        const id = document.getElementById('inv-player-id').value.trim();
-        if (!id) return;
+        const id = document.getElementById('inv-player-id').value;
         db.ref('players/' + id + '/inventory').once('value', snap => {
-            const items = snap.val() || [];
             const grid = document.getElementById('gm-inv-slots');
             grid.innerHTML = '';
-            const slots = [...items];
-            while (slots.length < 8) slots.push('');
-            slots.forEach((item, i) => {
-                grid.innerHTML += `<input class="gm-inv-input" id="gm-slot-${i}" value="${item}" placeholder="Slot ${i + 1}">`;
-            });
-            toast("Inventory loaded for " + id, true);
+            const items = snap.val() || [];
+            for(let i=0; i<8; i++) grid.innerHTML += `<input class="gm-inv-input" id="gm-slot-${i}" value="${items[i] || ''}" placeholder="Slot ${i+1}">`;
         });
     }
 
     function saveGMInv() {
-        const id = document.getElementById('inv-player-id').value.trim();
-        if (!id) return;
-        const slots = document.querySelectorAll('[id^="gm-slot-"]');
-        const items = Array.from(slots).map(s => s.value);
-        db.ref('players/' + id + '/inventory').set(items)
-            .then(() => toast("Inventory saved for " + id, true));
+        const id = document.getElementById('inv-player-id').value;
+        const items = Array.from(document.querySelectorAll('.gm-inv-input')).map(s => s.value);
+        db.ref('players/' + id + '/inventory').set(items).then(() => toast("Inv saved", true));
     }
 
-    // ─── BROADCAST ────────────────────────────────────────
-    function broadcastMsg() {
-        const msg = document.getElementById('broadcast-msg').value.trim();
-        if (!msg) return;
-        db.ref('worldData/broadcast').set({ msg, ts: Date.now() })
-            .then(() => {
-                document.getElementById('broadcast-msg').value = '';
-                toast("Broadcast sent", true);
-            });
-    }
-
-    // ─── TABS ─────────────────────────────────────────────
     function switchTab(tab) {
         ['status', 'powers', 'lore'].forEach(t => {
             document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
@@ -1098,40 +944,19 @@
         });
     }
 
-    function forgetKey() {
-        localStorage.removeItem('or_key');
-        document.getElementById('openrouter-key').value = '';
-        toast("API key forgotten", true);
-    }
-
-    function changeGMPassword() {
-        const old = document.getElementById('gm-old-pass').value;
-        const newP = document.getElementById('gm-new-pass').value.trim();
-        const confirm = document.getElementById('gm-new-pass2').value.trim();
-        const current = localStorage.getItem('gm_pass') || '1234';
-        if (old !== current) { toast("Wrong current password", true); return; }
-        if (!newP) { toast("New password cannot be empty", true); return; }
-        if (newP !== confirm) { toast("Passwords don't match", true); return; }
-        localStorage.setItem('gm_pass', newP);
-        document.getElementById('gm-old-pass').value = '';
-        document.getElementById('gm-new-pass').value = '';
-        document.getElementById('gm-new-pass2').value = '';
-        toast("GM password updated", true);
-    }
-        if (prompt("ACCESS:") === current) {
+    function enterGM() {
+        const pass = localStorage.getItem('gm_pass') || '1234';
+        if (prompt("ACCESS:") === pass) {
             document.getElementById('gm').classList.remove('hidden');
-            const saved = localStorage.getItem('or_key');
-            if (saved) document.getElementById('openrouter-key').value = saved;
+            document.getElementById('openrouter-key').value = localStorage.getItem('or_key') || '';
         }
     }
 
-    function enterGM() {
-        const current = localStorage.getItem('gm_pass') || '1234';
-
-    document.getElementById('openrouter-key').addEventListener('change', function() {
-        if (this.value.trim()) localStorage.setItem('or_key', this.value.trim());
-    });
     function closeGM() { document.getElementById('gm').classList.add('hidden'); }
+
+    function forgetKey() { localStorage.removeItem('or_key'); document.getElementById('openrouter-key').value = ''; }
+
+    document.getElementById('openrouter-key').addEventListener('change', e => localStorage.setItem('or_key', e.target.value));
 </script>
 </body>
 </html>
