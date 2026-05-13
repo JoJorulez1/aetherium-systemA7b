@@ -997,6 +997,11 @@
                 })
             });
             const data = await response.json();
+            if (!response.ok) {
+                document.getElementById('ai-thinking')?.remove();
+                chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">API Error ${response.status}: ${JSON.stringify(data)}</div>`;
+                return;
+            }
             const aiText = data.choices[0].message.content;
             const modelUsed = data.model || "unknown model";
             document.getElementById('ai-thinking')?.remove();
@@ -1004,7 +1009,7 @@
             chat.innerHTML += `<div class="ai-msg">${aiText}<br><br><span style="font-size:0.6rem; opacity:0.4;">via ${modelUsed}</span><br><button class="btn btn-gm btn-push" onclick="finalizeQuest()">Push to Lore Archive</button></div>`;
         } catch (e) {
             document.getElementById('ai-thinking')?.remove();
-            chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">Link Failed. Check API key or network.</div>`;
+            chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">Link Failed: ${e.message || JSON.stringify(e)}</div>`;
         }
         document.getElementById('gm-input').value = '';
         chat.scrollTop = chat.scrollHeight;
