@@ -979,10 +979,11 @@
                     "X-Title": "Aetherium"
                 },
                 body: JSON.stringify({
+                    max_tokens: 2000,
                     models: [
-                        "anthropic/claude-3.5-sonnet",
-                        "mistralai/mistral-large",
-                        "google/gemini-flash-1.5"
+                        "google/gemma-2-9b-it:free",
+                        "mistralai/mistral-7b-instruct:free",
+                        "meta-llama/llama-3.1-8b-instruct:free"
                     ],
                     messages: [
                         {
