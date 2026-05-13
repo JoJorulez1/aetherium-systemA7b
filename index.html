@@ -740,6 +740,13 @@
     function sync() {
         const id = document.getElementById('user-id').value.trim();
         if (!id) return;
+        
+        // SECURITY FIX: Prevent API keys from being created as player profiles
+        if (id.startsWith('sk-or')) {
+            toast("ERROR: Invalid Unit ID format.", true);
+            return;
+        }
+
         const playerRef = db.ref('players/' + id);
         playerRef.once('value', snap => {
             if (snap.exists()) {
@@ -875,8 +882,15 @@
             const tbody = document.getElementById('unit-table-body');
             tbody.innerHTML = "";
             snap.forEach(child => {
+                const childKey = child.key;
+                
+                // UI FIX: Filter out API keys from showing up in the table
+                if (childKey.includes('OpenRouter') || childKey.startsWith('sk-or-v1')) {
+                    return; 
+                }
+
                 const p = child.val();
-                tbody.innerHTML += `<tr><td>${child.key}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap || 100}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${childKey}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap || 100}</td></tr>`;
             });
         });
     }
