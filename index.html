@@ -688,7 +688,10 @@
 
         <div class="gm-section">
             <div class="gm-section-title">System Architect · AI Console</div>
-            <input id="openrouter-key" type="password" placeholder="OpenRouter API Key" style="border-color: var(--border-gm);">
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+                <input id="openrouter-key" type="password" placeholder="OpenRouter API Key" style="border-color: var(--border-gm); margin-bottom:0; flex:1;">
+                <button class="btn btn-sm btn-danger" onclick="forgetKey()">FORGET</button>
+            </div>
             <div class="ai-terminal" id="ai-convo">
                 <div class="ai-msg">System Architect: Memory nodes active. Awaiting input.</div>
             </div>
@@ -720,6 +723,14 @@
             <div class="gm-section-title">Broadcast Notification</div>
             <input id="broadcast-msg" placeholder="Message to all players...">
             <button class="btn btn-gm" onclick="broadcastMsg()">BROADCAST</button>
+        </div>
+
+        <div class="gm-section">
+            <div class="gm-section-title">Change GM Password</div>
+            <input id="gm-old-pass" type="password" placeholder="Current password" style="margin-bottom:8px;">
+            <input id="gm-new-pass" type="password" placeholder="New password" style="margin-bottom:8px;">
+            <input id="gm-new-pass2" type="password" placeholder="Confirm new password">
+            <button class="btn btn-gm" onclick="changeGMPassword()">UPDATE PASSWORD</button>
         </div>
 
         <button class="exit-btn" onclick="closeGM()">[ EXIT TERMINAL ]</button>
@@ -1087,7 +1098,39 @@
         });
     }
 
-    function enterGM() { if (prompt("ACCESS:") === "1234") document.getElementById('gm').classList.remove('hidden'); }
+    function forgetKey() {
+        localStorage.removeItem('or_key');
+        document.getElementById('openrouter-key').value = '';
+        toast("API key forgotten", true);
+    }
+
+    function changeGMPassword() {
+        const old = document.getElementById('gm-old-pass').value;
+        const newP = document.getElementById('gm-new-pass').value.trim();
+        const confirm = document.getElementById('gm-new-pass2').value.trim();
+        const current = localStorage.getItem('gm_pass') || '1234';
+        if (old !== current) { toast("Wrong current password", true); return; }
+        if (!newP) { toast("New password cannot be empty", true); return; }
+        if (newP !== confirm) { toast("Passwords don't match", true); return; }
+        localStorage.setItem('gm_pass', newP);
+        document.getElementById('gm-old-pass').value = '';
+        document.getElementById('gm-new-pass').value = '';
+        document.getElementById('gm-new-pass2').value = '';
+        toast("GM password updated", true);
+    }
+        if (prompt("ACCESS:") === current) {
+            document.getElementById('gm').classList.remove('hidden');
+            const saved = localStorage.getItem('or_key');
+            if (saved) document.getElementById('openrouter-key').value = saved;
+        }
+    }
+
+    function enterGM() {
+        const current = localStorage.getItem('gm_pass') || '1234';
+
+    document.getElementById('openrouter-key').addEventListener('change', function() {
+        if (this.value.trim()) localStorage.setItem('or_key', this.value.trim());
+    });
     function closeGM() { document.getElementById('gm').classList.add('hidden'); }
 </script>
 </body>
