@@ -728,6 +728,20 @@
     let pendingLoreDraft = "";
     let broadcastListener = null;
 
+    // --- NOTIFICATION HANDLER ---
+    function sendSystemNotification(title, message, isGM = false) {
+        // 1. In-app toast
+        toast(`${title}: ${message}`, isGM);
+
+        // 2. Browser notification
+        if (Notification.permission === 'granted') {
+            new Notification(title, {
+                body: message,
+                icon: "https://cdn-icons-png.flaticon.com/512/5822/5822082.png"
+            });
+        }
+    }
+
     function toast(msg, isGM = false) {
         const el = document.getElementById('toast');
         const msgEl = document.getElementById('toast-msg');
@@ -741,7 +755,11 @@
         const id = document.getElementById('user-id').value.trim();
         if (!id) return;
         
-        // SECURITY FIX: Prevent API keys from being created as player profiles
+        // Request Browser Permission
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+
         if (id.startsWith('sk-or')) {
             toast("ERROR: Invalid Unit ID format.", true);
             return;
@@ -751,6 +769,8 @@
         playerRef.once('value', snap => {
             if (snap.exists()) {
                 currentID = id;
+                // ALERT: Login
+                sendSystemNotification("SYSTEM ONLINE", `Unit ${id} has successfully linked.`);
                 startListener(id);
             } else {
                 const newPlayerData = {
@@ -760,8 +780,8 @@
                 };
                 playerRef.set(newPlayerData).then(() => {
                     currentID = id;
+                    sendSystemNotification("REGISTRY CREATED", `New Unit ${id} initialized.`);
                     startListener(id);
-                    toast("Unit " + id + " linked");
                 });
             }
         });
@@ -883,12 +903,9 @@
             tbody.innerHTML = "";
             snap.forEach(child => {
                 const childKey = child.key;
-                
-                // UI FIX: Filter out API keys from showing up in the table
                 if (childKey.includes('OpenRouter') || childKey.startsWith('sk-or-v1')) {
                     return; 
                 }
-
                 const p = child.val();
                 tbody.innerHTML += `<tr><td>${childKey}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap || 100}</td></tr>`;
             });
@@ -922,15 +939,27 @@
         toast("Lore archived", true);
     }
 
+    // --- DISPENSE WITH NOTIFICATIONS ---
     function dispense() {
         const id = document.getElementById('rew-id').value;
         const c = parseInt(document.getElementById('rew-c').value) || 0;
         const x = parseInt(document.getElementById('rew-x').value) || 0;
+        if(!id) return;
+
         db.ref('players/' + id).transaction(p => {
             if (p) {
+                const oldLvl = p.lvl;
                 p.coins += c; p.exp += x;
                 let req = Math.floor(100 * Math.pow(1.2, p.lvl - 1));
                 while (p.exp >= req) { p.exp -= req; p.lvl++; req = Math.floor(100 * Math.pow(1.2, p.lvl - 1)); }
+                
+                // ALERT: Database Update
+                sendSystemNotification("DATABASE UPDATED", `Unit ${id} received ${c} Coins and ${x} XP.`, true);
+
+                // ALERT: Level Up
+                if (p.lvl > oldLvl) {
+                    sendSystemNotification("LEVEL UP", `Unit ${id} reached Level ${p.lvl}!`, true);
+                }
             } return p;
         });
     }
