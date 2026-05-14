@@ -272,6 +272,7 @@
         }
         .btn-danger { border-color: var(--red); color: var(--red); }
         .btn-danger::before { background: var(--red); }
+
         .btn-push { padding: 8px 14px; font-size: 0.72rem; width: auto; margin-top: 10px; display: inline-block; }
 
         .hidden { display: none !important; }
@@ -624,18 +625,22 @@
 
         <div id="view-powers" class="hidden">
             <div style="margin-bottom:20px;">
-                <span class="label">Abilities</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span class="label" style="margin:0;">Abilities</span>
+                </div>
                 <div class="power-list" id="powers-list"></div>
                 <div class="add-row">
-                    <input id="new-power" placeholder="Add power or ability...">
+                    <input id="new-power" placeholder="Add power or ability..." style="margin-bottom:0;">
                     <button class="btn btn-sm" onclick="addPower()">ADD</button>
                 </div>
             </div>
             <div style="border-top:1px solid var(--border); padding-top:20px;">
-                <span class="label" style="color:var(--gm);">Techniques</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span class="label" style="margin:0; color:var(--gm);">Techniques</span>
+                </div>
                 <div class="power-list" id="techs-list"></div>
                 <div class="add-row">
-                    <input id="new-tech" placeholder="Add technique...">
+                    <input id="new-tech" placeholder="Add technique..." style="margin-bottom:0;">
                     <button class="btn btn-sm btn-gm" onclick="addTech()">ADD</button>
                 </div>
             </div>
@@ -666,7 +671,7 @@
         <div class="gm-section">
             <div class="gm-section-title">System Architect · AI Console</div>
             <div style="display:flex; gap:6px; margin-bottom:10px;">
-                <input id="openrouter-key" type="password" placeholder="OpenRouter API Key" style="border-color:var(--border-gm); margin-bottom:0; flex:1;">
+                <input id="openrouter-key" type="password" placeholder="OpenRouter API Key" style="border-color: var(--border-gm); margin-bottom:0; flex:1;">
                 <button class="btn btn-sm btn-danger" onclick="forgetKey()">FORGET</button>
             </div>
             <div class="ai-terminal" id="ai-convo">
@@ -678,7 +683,7 @@
 
         <div class="gm-section">
             <div class="gm-section-title">Balance Dispenser</div>
-            <input id="rew-id" placeholder="Player ID">
+            <input id="rew-id" placeholder="Player ID" style="margin-bottom:8px;">
             <div class="dispenser-grid">
                 <input id="rew-c" placeholder="+ Coins">
                 <input id="rew-x" placeholder="+ XP">
@@ -688,7 +693,7 @@
 
         <div class="gm-section">
             <div class="gm-section-title">Inventory Editor</div>
-            <input id="inv-player-id" placeholder="Player ID">
+            <input id="inv-player-id" placeholder="Player ID" style="margin-bottom:8px;">
             <div id="gm-inv-slots" class="gm-inv-grid"></div>
             <div style="display:flex; gap:6px; margin-top:8px;">
                 <button class="btn btn-sm btn-gm" onclick="loadGMInv()">LOAD</button>
@@ -704,10 +709,10 @@
 
         <div class="gm-section">
             <div class="gm-section-title">Change GM Password</div>
-            <input id="gm-old-pass" type="password" placeholder="Current password">
-            <input id="gm-new-pass" type="password" placeholder="New password">
+            <input id="gm-old-pass" type="password" placeholder="Current password" style="margin-bottom:8px;">
+            <input id="gm-new-pass" type="password" placeholder="New password" style="margin-bottom:8px;">
             <input id="gm-new-pass2" type="password" placeholder="Confirm new password">
-            <button class="btn btn-gm" onclick="changeGMPassword()">Update Password</button>
+            <button class="btn btn-gm" onclick="changeGMPassword()">UPDATE PASSWORD</button>
         </div>
 
         <button class="exit-btn" onclick="closeGM()">[ EXIT TERMINAL ]</button>
@@ -736,11 +741,12 @@
         el._t = setTimeout(() => el.className = isGM ? 'gm-toast' : '', 3000);
     }
 
-    function sendSystemNotification(title, message, isGM = false) {
-        toast(`${title}: ${message}`, isGM);
+    // ─── NOTIFICATIONS ────────────────────────────────────
+    function notify(title, body, isGM = false) {
+        toast(title + ': ' + body, isGM);
         if (Notification.permission === 'granted') {
             new Notification(title, {
-                body: message,
+                body: body,
                 icon: "https://cdn-icons-png.flaticon.com/512/5822/5822082.png"
             });
         }
@@ -758,13 +764,17 @@
             if (snap.exists()) {
                 currentID = id;
                 startListener(id);
-                sendSystemNotification("SYSTEM ONLINE", `Unit ${id} linked.`);
+                notify("SYSTEM ONLINE", "Unit " + id + " linked.");
             } else {
-                const newData = { lvl: 1, exp: 0, coins: 0, ap: 100, maxAp: 100, inventory: [], powers: [], techniques: [] };
-                db.ref('players/' + id).set(newData).then(() => {
+                const newPlayerData = {
+                    lvl: 1, exp: 0, coins: 0,
+                    ap: 100, maxAp: 100,
+                    inventory: [], powers: [], techniques: []
+                };
+                db.ref('players/' + id).set(newPlayerData).then(() => {
                     currentID = id;
                     startListener(id);
-                    sendSystemNotification("REGISTRY CREATED", `New Unit ${id} initialized.`);
+                    notify("REGISTRY CREATED", "New Unit " + id + " initialized.");
                 });
             }
         });
@@ -774,16 +784,16 @@
             list.innerHTML = '';
             if (!snap.exists()) { list.innerHTML = '<div class="empty-state">NO LORE ENTRIES YET</div>'; return; }
             snap.forEach(entry => {
-                const d = entry.val();
-                list.innerHTML += `<div class="lore-entry"><div class="lore-meta">${d.date}</div><div class="lore-text">${d.text}</div></div>`;
+                const data = entry.val();
+                list.innerHTML += `<div class="lore-entry"><div class="lore-meta">${data.date}</div><div class="lore-text">${data.text}</div></div>`;
             });
         });
 
-        listenBroadcast(id);
         loadGMTable();
+        listenBroadcast(id);
     }
 
-    // ─── FIX: dashboard switch happens here, not inside listener ─────
+    // ─── FIX: switch dashboard immediately, don't wait for listener ──
     function startListener(id) {
         document.getElementById('auth').classList.add('hidden');
         document.getElementById('dash').classList.remove('hidden');
@@ -803,6 +813,7 @@
         document.getElementById('user-id').value = '';
         document.getElementById('dash').classList.add('hidden');
         document.getElementById('auth').classList.remove('hidden');
+        switchTab('status');
         toast("Unit disconnected");
     }
 
@@ -821,33 +832,31 @@
         document.getElementById('bar-xp').style.width = (data.exp / req * 100) + "%";
         document.getElementById('xp-val').innerText = `${Math.floor(data.exp)} / ${req}`;
 
-        // Inventory
         const inv = document.getElementById('disp-inv');
         inv.innerHTML = '';
         const items = data.inventory || [];
         items.forEach((item, i) => {
-            if (!item) inv.innerHTML += `<div class="inv-slot empty" onclick="editSlot(${i})"></div>`;
-            else inv.innerHTML += `<div class="inv-slot" onclick="editSlot(${i})">${item}<span class="del-slot" onclick="event.stopPropagation(); deleteSlot(${i})">✕</span></div>`;
+            if (item === '' || item === null) {
+                inv.innerHTML += `<div class="inv-slot empty" onclick="editSlot(${i})"></div>`;
+            } else {
+                inv.innerHTML += `<div class="inv-slot" onclick="editSlot(${i})">${item}<span class="del-slot" onclick="event.stopPropagation(); deleteSlot(${i})">✕</span></div>`;
+            }
         });
         if (items.length < 16) inv.innerHTML += `<div class="inv-slot empty" onclick="addInvSlot()"></div>`;
 
-        // Powers
         const pList = document.getElementById('powers-list');
         pList.innerHTML = '';
-        const powers = data.powers || [];
-        if (!powers.length) pList.innerHTML = '<div class="empty-state">NO POWERS REGISTERED</div>';
-        else powers.forEach((p, i) => {
+        (data.powers || []).forEach((p, i) => {
             pList.innerHTML += `<div class="power-item"><span>${p}</span><span class="del-btn" onclick="deletePower(${i})">✕</span></div>`;
         });
+        if (!(data.powers || []).length) pList.innerHTML = '<div class="empty-state">NO POWERS REGISTERED</div>';
 
-        // Techniques
         const tList = document.getElementById('techs-list');
         tList.innerHTML = '';
-        const techs = data.techniques || [];
-        if (!techs.length) tList.innerHTML = '<div class="empty-state">NO TECHNIQUES REGISTERED</div>';
-        else techs.forEach((t, i) => {
+        (data.techniques || []).forEach((t, i) => {
             tList.innerHTML += `<div class="power-item technique"><span>${t}</span><span class="del-btn" onclick="deleteTech(${i})">✕</span></div>`;
         });
+        if (!(data.techniques || []).length) tList.innerHTML = '<div class="empty-state">NO TECHNIQUES REGISTERED</div>';
     }
 
     // ─── AP ───────────────────────────────────────────────
@@ -867,27 +876,27 @@
 
     // ─── INVENTORY ────────────────────────────────────────
     function addInvSlot() {
-        const name = prompt("Item name:");
+        const name = prompt("Item name (or leave empty for blank slot):");
         if (name === null) return;
         db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.inventory = p.inventory || []; p.inventory.push(name); }
+            if (p) { p.inventory = p.inventory || []; p.inventory.push(name || ''); }
             return p;
-        }, (err, committed) => { if (committed) toast("Item added"); });
+        }, (err, committed) => { if (committed) toast("Inventory updated"); });
     }
 
-    function editSlot(i) {
-        db.ref('players/' + currentID + '/inventory/' + i).once('value', snap => {
+    function editSlot(index) {
+        db.ref('players/' + currentID + '/inventory/' + index).once('value', snap => {
             const current = snap.val() || '';
             const newVal = prompt("Edit item:", current);
             if (newVal === null) return;
-            db.ref('players/' + currentID + '/inventory/' + i).set(newVal)
+            db.ref('players/' + currentID + '/inventory/' + index).set(newVal)
                 .then(() => toast("Item updated"));
         });
     }
 
-    function deleteSlot(i) {
+    function deleteSlot(index) {
         db.ref('players/' + currentID).transaction(p => {
-            if (p && p.inventory) p.inventory.splice(i, 1);
+            if (p && p.inventory) p.inventory.splice(index, 1);
             return p;
         }, (err, committed) => { if (committed) toast("Item removed"); });
     }
@@ -904,9 +913,9 @@
         });
     }
 
-    function deletePower(i) {
+    function deletePower(index) {
         db.ref('players/' + currentID).transaction(p => {
-            if (p && p.powers) p.powers.splice(i, 1);
+            if (p && p.powers) p.powers.splice(index, 1);
             return p;
         }, (err, committed) => { if (committed) toast("Power removed"); });
     }
@@ -922,20 +931,21 @@
         });
     }
 
-    function deleteTech(i) {
+    function deleteTech(index) {
         db.ref('players/' + currentID).transaction(p => {
-            if (p && p.techniques) p.techniques.splice(i, 1);
+            if (p && p.techniques) p.techniques.splice(index, 1);
             return p;
         }, (err, committed) => { if (committed) toast("Technique removed"); });
     }
 
     // ─── BROADCAST ────────────────────────────────────────
     function listenBroadcast(id) {
+        firstBroadcast = true;
         broadcastListener = db.ref('worldData/broadcast').on('value', snap => {
             if (firstBroadcast) { firstBroadcast = false; return; }
             if (snap.exists()) {
                 const data = snap.val();
-                sendSystemNotification("📢 GM BROADCAST", data.msg, true);
+                notify("📢 GM BROADCAST", data.msg, true);
             }
         });
     }
@@ -949,8 +959,8 @@
 
     // ─── GM TABLE ─────────────────────────────────────────
     function loadGMTable() {
+        const tbody = document.getElementById('unit-table-body');
         db.ref('players').on('value', snap => {
-            const tbody = document.getElementById('unit-table-body');
             tbody.innerHTML = "";
             snap.forEach(child => {
                 const key = child.key;
@@ -992,12 +1002,12 @@
             const data = await response.json();
             document.getElementById('ai-thinking')?.remove();
             if (!response.ok) {
-                chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">API Error ${response.status}: ${JSON.stringify(data.error?.message || data)}</div>`;
+                chat.innerHTML += `<div class="ai-msg" style="color:#ef4444;">API Error ${response.status}: ${data.error?.message || JSON.stringify(data)}</div>`;
                 return;
             }
             const aiText = data.choices[0].message.content;
-            pendingLoreDraft = aiText;
             const modelUsed = data.model || "auto";
+            pendingLoreDraft = aiText;
             chat.innerHTML += `<div class="ai-msg">${aiText}<br><br><span style="font-size:0.6rem; opacity:0.4;">via ${modelUsed}</span><br><button class="btn btn-gm btn-push" onclick="finalizeQuest()">Push to Lore Archive</button></div>`;
         } catch (e) {
             document.getElementById('ai-thinking')?.remove();
@@ -1026,12 +1036,12 @@
                 p.coins += c; p.exp += x;
                 let req = Math.floor(100 * Math.pow(1.2, p.lvl - 1));
                 while (p.exp >= req) { p.exp -= req; p.lvl++; req = Math.floor(100 * Math.pow(1.2, p.lvl - 1)); }
-                if (p.lvl > oldLvl) sendSystemNotification("LEVEL UP", `Unit ${id} reached Level ${p.lvl}!`, true);
+                if (p.lvl > oldLvl) notify("LEVEL UP", "Unit " + id + " reached Level " + p.lvl + "!", true);
             } return p;
         }, (error, committed, snapshot) => {
             if (committed) {
                 const data = snapshot.val();
-                sendSystemNotification("DATABASE UPDATED", `${id} → LVL ${data.lvl}`, true);
+                notify("DATABASE UPDATED", id + " → LVL " + data.lvl, true);
                 document.getElementById('rew-c').value = "";
                 document.getElementById('rew-x').value = "";
             } else { alert("❌ Update Failed: ID not found."); }
@@ -1058,7 +1068,8 @@
     function saveGMInv() {
         const id = document.getElementById('inv-player-id').value.trim();
         if (!id) return;
-        const items = Array.from(document.querySelectorAll('[id^="gm-slot-"]')).map(s => s.value);
+        const slots = document.querySelectorAll('[id^="gm-slot-"]');
+        const items = Array.from(slots).map(s => s.value);
         db.ref('players/' + id + '/inventory').set(items)
             .then(() => toast("Inventory saved for " + id, true));
     }
