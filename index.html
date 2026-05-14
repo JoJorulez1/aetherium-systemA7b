@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aetherium | System OS</title>
+    <title>AETHERIUM | System OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -11,23 +11,20 @@
         :root {
             --neon: #00f2ff;
             --neon-dim: rgba(0, 242, 255, 0.15);
-            --neon-glow: 0 0 20px rgba(0, 242, 255, 0.4), 0 0 60px rgba(0, 242, 255, 0.1);
+            --neon-glow: 0 0 20px rgba(0, 242, 255, 0.4);
             --gm: #a855f7;
             --gm-dim: rgba(168, 85, 247, 0.15);
-            --gm-glow: 0 0 20px rgba(168, 85, 247, 0.4);
             --bg: #020617;
             --panel: #050d1a;
-            --panel2: #07111f;
             --border: rgba(0, 242, 255, 0.12);
             --border-gm: rgba(168, 85, 247, 0.2);
             --text: #7a9ab8;
             --text-bright: #c8dff0;
             --red: #ef4444;
             --yellow: #f59e0b;
-            --green: #22c55e;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body {
             background: var(--bg);
@@ -35,30 +32,20 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px 0 40px;
+            padding: 20px 0;
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(0,242,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,242,255,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
+        /* Scanline Overlay */
         body::after {
-            content: '';
+            content: " ";
             position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(0,242,255,0.06) 0%, transparent 60%),
-                        radial-gradient(ellipse at 100% 100%, rgba(168,85,247,0.05) 0%, transparent 50%);
-            z-index: 0;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
 
@@ -69,654 +56,155 @@
             border: 1px solid var(--border);
             border-top: 3px solid var(--neon);
             border-radius: 16px;
-            padding: 28px 24px;
+            padding: 24px;
             position: relative;
             z-index: 1;
-            box-shadow: 0 0 40px rgba(0,242,255,0.05), 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(0,242,255,0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
 
-        .frame::before, .frame::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-color: var(--neon);
-            border-style: solid;
-            opacity: 0.6;
-        }
-        .frame::before { bottom: 16px; left: 16px; border-width: 0 0 1px 1px; }
-        .frame::after { bottom: 16px; right: 16px; border-width: 0 1px 1px 0; }
+        /* UI Elements */
+        .label { font-size: 0.65rem; color: var(--neon); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 6px; }
+        .bar-bg { background: rgba(0,0,0,0.6); height: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px; }
+        #bar-ap { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        #bar-xp { background: linear-gradient(90deg, #b45309, #f59e0b); box-shadow: 0 0 10px rgba(245,158,11,0.3); }
 
-        .label {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.65rem;
-            color: var(--neon);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: block;
-            margin-bottom: 6px;
-            opacity: 0.8;
-        }
-
-        .bar-bg {
-            background: rgba(0,0,0,0.6);
-            height: 8px;
-            border-radius: 4px;
-            margin-bottom: 4px;
-            border: 1px solid rgba(255,255,255,0.05);
-            overflow: hidden;
-            position: relative;
-        }
-        .bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 4px;
-            position: relative;
-        }
-        .bar-fill::after {
-            content: '';
-            position: absolute;
-            right: 0; top: 0; bottom: 0;
-            width: 4px;
-            background: white;
-            opacity: 0.6;
-            border-radius: 2px;
-            box-shadow: 0 0 6px white;
-        }
-        #bar-ap { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 10px rgba(239,68,68,0.4); }
-        #bar-xp { background: linear-gradient(90deg, #b45309, #f59e0b); box-shadow: 0 0 10px rgba(245,158,11,0.4); }
-
-        .bar-label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .bar-label-row .label { margin-bottom: 0; }
-        .bar-val { font-size: 0.65rem; color: var(--text); font-weight: 600; }
-
-        .tabs {
-            display: flex;
-            gap: 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.68rem;
-            color: var(--text);
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 1.2px;
-            padding: 8px 12px 10px;
-            position: relative;
-            transition: color 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .tab:hover { color: var(--text-bright); }
+        .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .tab { font-size: 0.7rem; color: var(--text); cursor: pointer; text-transform: uppercase; font-weight: 600; letter-spacing: 1.2px; padding: 12px; transition: 0.3s; position: relative; flex: 1; text-align: center; }
         .tab.active { color: var(--neon); }
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; left: 0; right: 0;
-            height: 2px;
-            background: var(--neon);
-            box-shadow: var(--neon-glow);
-        }
+        .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--neon); box-shadow: var(--neon-glow); }
 
-        .archive-scroll {
-            height: 300px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-        .archive-scroll::-webkit-scrollbar { width: 3px; }
-        .archive-scroll::-webkit-scrollbar-track { background: transparent; }
-        .archive-scroll::-webkit-scrollbar-thumb { background: var(--neon-dim); border-radius: 2px; }
-
-        .lore-entry {
+        /* Quest Cards */
+        .quest-card {
             background: rgba(0, 242, 255, 0.02);
             border: 1px solid var(--border);
-            border-left: 2px solid var(--neon);
-            padding: 14px;
             border-radius: 8px;
-            margin-bottom: 10px;
-            transition: background 0.2s;
-        }
-        .lore-entry:hover { background: rgba(0,242,255,0.04); }
-        .lore-text { font-size: 0.85rem; color: var(--text-bright); line-height: 1.6; font-weight: 400; }
-        .lore-meta { font-size: 0.6rem; color: var(--neon); opacity: 0.5; margin-bottom: 6px; letter-spacing: 1px; font-weight: 600; }
-
-        .ai-terminal {
-            background: #000;
-            border: 1px solid var(--border-gm);
-            border-radius: 10px;
-            padding: 14px;
-            height: 220px;
-            overflow-y: auto;
-            font-size: 0.82rem;
-            color: #d8b4fe;
+            padding: 15px;
             margin-bottom: 12px;
-            font-family: 'Rajdhani', sans-serif;
-            line-height: 1.5;
+            border-left: 4px solid var(--neon);
         }
-        .ai-terminal::-webkit-scrollbar { width: 3px; }
-        .ai-terminal::-webkit-scrollbar-thumb { background: var(--border-gm); }
-        .gm-msg { color: var(--text-bright); text-align: right; margin-bottom: 12px; font-style: italic; opacity: 0.7; font-size: 0.8rem; }
-        .ai-msg { margin-bottom: 16px; border-left: 2px solid var(--gm); padding-left: 12px; color: #e9d5ff; }
+        .quest-card.hard { border-left-color: var(--red); }
+        .quest-card.evolution { border-left-color: var(--gm); }
+        .quest-title { font-family: 'Cinzel'; font-size: 0.85rem; color: var(--text-bright); margin-bottom: 4px; }
+        .quest-desc { font-size: 0.75rem; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
+        .quest-rew { font-size: 0.65rem; color: var(--yellow); letter-spacing: 1px; font-weight: 700; }
 
-        input, textarea, select {
-            width: 100%;
-            background: rgba(0,0,0,0.5);
+        /* Power Slots */
+        .power-slot {
+            background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
-            padding: 12px 14px;
-            color: white;
             border-radius: 8px;
-            margin-bottom: 10px;
-            outline: none;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input:focus, textarea:focus, select:focus {
-            border-color: rgba(0,242,255,0.4);
-            box-shadow: 0 0 0 3px rgba(0,242,255,0.06);
-        }
-        textarea { resize: none; min-height: 80px; }
-        select option { background: #050d1a; }
-
-        .btn {
-            width: 100%;
-            background: transparent;
-            border: 1px solid var(--neon);
-            color: var(--neon);
             padding: 14px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--neon);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .btn:hover::before { opacity: 0.08; }
-        .btn:hover { box-shadow: var(--neon-glow); }
-        .btn:active { transform: scale(0.98); }
+        .power-slot.sealed { border-style: dashed; opacity: 0.5; background: rgba(0,0,0,0.4); }
+        .power-name { font-size: 0.9rem; color: var(--text-bright); font-weight: 600; }
+        .power-meta { font-size: 0.6rem; color: var(--neon); text-transform: uppercase; }
+        .seal-tag { font-size: 0.55rem; color: var(--red); border: 1px solid var(--red); padding: 2px 6px; border-radius: 4px; font-weight: 800; }
 
+        input, textarea, select { width: 100%; background: #000; border: 1px solid var(--border); padding: 12px; color: white; border-radius: 8px; margin-bottom: 10px; font-family: 'Rajdhani'; }
+        .btn { width: 100%; background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
         .btn-gm { border-color: var(--gm); color: var(--gm); }
-        .btn-gm::before { background: var(--gm); }
-        .btn-gm:hover { box-shadow: var(--gm-glow); }
-
-        .btn-sm {
-            padding: 7px 12px;
-            font-size: 0.7rem;
-            width: auto;
-            letter-spacing: 1px;
-        }
-        .btn-danger { border-color: var(--red); color: var(--red); }
-        .btn-danger::before { background: var(--red); }
-
-        .btn-push { padding: 8px 14px; font-size: 0.72rem; width: auto; margin-top: 10px; display: inline-block; }
-
+        
         .hidden { display: none !important; }
 
-        .gm-key {
-            position: absolute;
-            top: 12px; right: 16px;
-            font-size: 9px;
-            color: #1e293b;
-            cursor: pointer;
-            letter-spacing: 1px;
-            font-family: 'Rajdhani', sans-serif;
-            transition: color 0.3s;
-        }
-        .gm-key:hover { color: var(--gm); }
-
-        #toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-80px);
-            background: var(--panel);
-            border: 1px solid var(--neon);
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--neon);
-            box-shadow: var(--neon-glow);
-            z-index: 999;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); border: 1px solid var(--neon); padding: 12px 25px; border-radius: 50px; z-index: 1000; transition: 0.5s; color: var(--neon); font-size: 0.8rem; font-weight: 700; box-shadow: var(--neon-glow); }
         #toast.show { transform: translateX(-50%) translateY(0); }
-        #toast.gm-toast { border-color: var(--gm); color: var(--gm); box-shadow: var(--gm-glow); }
-
-        #auth { animation: fadeUp 0.5s ease; }
-
-        .auth-logo { text-align: center; margin: 30px 0 10px; }
-        .auth-logo h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.4rem;
-            font-weight: 900;
-            letter-spacing: 8px;
-            color: var(--neon);
-            text-shadow: var(--neon-glow);
-            line-height: 1;
-        }
-        .auth-logo .subtitle { font-size: 0.6rem; color: var(--text); letter-spacing: 4px; margin-top: 8px; font-weight: 600; }
-
-        .auth-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 28px 0 20px;
-        }
-        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .auth-divider span { font-size: 0.6rem; color: var(--text); letter-spacing: 2px; }
-
-        #dash { animation: fadeUp 0.4s ease; }
-
-        .unit-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-        .unit-name { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 600; color: var(--text-bright); letter-spacing: 2px; }
-        
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        
-        .unit-badge {
-            background: var(--neon-dim);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 0.65rem;
-            color: var(--neon);
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 0.6rem;
-            color: rgba(239,68,68,0.6);
-            letter-spacing: 1px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.2s;
-        }
-        .logout-btn:hover { border-color: var(--red); color: var(--red); }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-        }
-        .stat-card {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-        .stat-card.coins::before { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
-        .stat-card.level::before { background: linear-gradient(90deg, transparent, var(--neon), transparent); }
-        .stat-value { font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 600; margin-top: 6px; }
-        .stat-card.coins .stat-value { color: #f59e0b; }
-        .stat-card.level .stat-value { color: var(--neon); text-shadow: var(--neon-glow); }
-
-        .ap-controls {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
-            margin-top: -4px;
-        }
-        .ap-btn {
-            flex: 1;
-            background: transparent;
-            border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 6px;
-            color: rgba(239,68,68,0.7);
-            padding: 6px;
-            font-size: 0.65rem;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ap-btn:hover { border-color: var(--red); color: var(--red); background: rgba(239,68,68,0.05); }
-        .ap-btn.restore { border-color: rgba(34,197,94,0.3); color: rgba(34,197,94,0.7); }
-        .ap-btn.restore:hover { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.05); }
-
-        .inv-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .inv-label { font-size: 0.65rem; color: var(--neon); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; }
-
-        #disp-inv {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 5px;
-        }
-        .inv-slot {
-            aspect-ratio: 1;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            transition: border-color 0.2s;
-            position: relative;
-            cursor: pointer;
-            text-align: center;
-            padding: 4px;
-            color: var(--text-bright);
-            word-break: break-word;
-            line-height: 1.2;
-        }
-        .inv-slot:hover { border-color: rgba(0,242,255,0.4); }
-        .inv-slot.empty::after { content: '+'; color: rgba(0,242,255,0.15); font-size: 1.2rem; }
-        .inv-slot .del-slot {
-            position: absolute;
-            top: 2px; right: 3px;
-            font-size: 0.55rem;
-            color: rgba(239,68,68,0.4);
-            display: none;
-        }
-        .inv-slot:hover .del-slot { display: block; }
-
-        .power-list { display: flex; flex-direction: column; gap: 8px; }
-        .power-item {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            border-left: 2px solid var(--neon);
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-bright);
-            font-weight: 500;
-        }
-        .power-item.technique { border-left-color: var(--gm); }
-        .power-item .del-btn {
-            color: rgba(239,68,68,0.3);
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 2px 6px;
-            transition: color 0.2s;
-            flex-shrink: 0;
-        }
-        .power-item .del-btn:hover { color: var(--red); }
-
-        .add-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-        }
-        .add-row input { margin-bottom: 0; flex: 1; }
-
-        .empty-state {
-            text-align: center;
-            padding: 20px;
-            color: rgba(0,242,255,0.15);
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-        }
-
-        #gm { animation: fadeUp 0.4s ease; }
-
-        .gm-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-gm);
-        }
-        .gm-header h2 { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gm); letter-spacing: 3px; font-weight: 600; text-shadow: var(--gm-glow); }
-        .gm-dot { width: 6px; height: 6px; background: var(--gm); border-radius: 50%; box-shadow: 0 0 8px var(--gm); animation: pulse 2s infinite; }
-
-        .gm-section { background: rgba(0,0,0,0.25); border: 1px solid var(--border-gm); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-        .gm-section-title { font-size: 0.6rem; color: var(--gm); letter-spacing: 2px; font-weight: 700; margin-bottom: 12px; opacity: 0.8; }
-
-        #unit-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; color: var(--text); font-family: 'Rajdhani', sans-serif; }
-        #unit-table th { color: var(--gm); border-bottom: 1px solid var(--border-gm); text-align: left; padding: 6px 8px; font-size: 0.65rem; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
-        #unit-table td { padding: 8px; border-bottom: 1px solid rgba(168,85,247,0.06); color: var(--text-bright); font-weight: 500; }
-        #unit-table tr:hover td { background: rgba(168,85,247,0.03); }
-
-        .dispenser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .dispenser-grid input { margin-bottom: 0; }
-
-        .gm-inv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
-        .gm-inv-input { margin-bottom: 0 !important; font-size: 0.8rem !important; padding: 8px 10px !important; }
-
-        .exit-btn {
-            background: transparent;
-            border: none;
-            color: #2d3748;
-            font-size: 0.7rem;
-            cursor: pointer;
-            width: 100%;
-            padding: 12px;
-            font-family: 'Rajdhani', sans-serif;
-            letter-spacing: 1px;
-            transition: color 0.2s;
-            margin-top: 8px;
-        }
-        .exit-btn:hover { color: var(--text); }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
     </style>
 </head>
 <body>
 
-<div id="toast">⚡ <span id="toast-msg"></span></div>
+<div id="toast">SYSTEM: <span id="toast-msg"></span></div>
 
 <div class="frame">
-    <div class="gm-key" onclick="enterGM()">[GM_ROOT]</div>
-
-    <!-- AUTH -->
+    <!-- AUTHENTICATION SCREEN -->
     <div id="auth">
-        <div class="auth-logo">
-            <h1>AETHERIUM</h1>
-            <div class="subtitle">SYSTEM OS · TOWER REGISTRY</div>
-        </div>
-        <div class="auth-divider"><span>UNIT AUTHENTICATION</span></div>
-        <input id="user-id" type="text" placeholder="ENTER UNIT IDENTIFIER" style="text-align:center; letter-spacing:2px;">
+        <h1 style="font-family:'Cinzel'; text-align:center; letter-spacing:6px; color:var(--neon); margin-top:20px;">AETHERIUM</h1>
+        <p style="text-align:center; font-size:0.6rem; letter-spacing:3px; margin-bottom:40px; color:var(--text);">UNIT SYNCHRONIZATION</p>
+        <input id="user-id" type="text" placeholder="UNIT ID (e.g. Jojo)" style="text-align:center;">
         <button class="btn" onclick="sync()">Initialize Link</button>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- MAIN DASHBOARD -->
     <div id="dash" class="hidden">
-        <div class="unit-header">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div>
-                <div style="font-size:0.6rem; color:var(--text); letter-spacing:2px; margin-bottom:4px;">UNIT ONLINE</div>
-                <div class="unit-name" id="disp-name">NULL</div>
+                <div style="font-size:0.5rem; color:var(--neon); letter-spacing:2px;">LINKED UNIT</div>
+                <div id="disp-name" style="font-family:'Cinzel'; font-size:1.1rem; color:var(--text-bright);">UNKNOWN</div>
             </div>
-            <div class="header-right">
-                <div class="unit-badge">ACTIVE</div>
-                <button class="logout-btn" onclick="logout()">EXIT</button>
-            </div>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-size:0.6rem; cursor:pointer; font-weight:bold;">[DISCONNECT]</button>
         </div>
 
         <div class="tabs">
-            <div id="t-status" class="tab active" onclick="switchTab('status')">Status</div>
-            <div id="t-powers" class="tab" onclick="switchTab('powers')">Powers</div>
-            <div id="t-lore" class="tab" onclick="switchTab('lore')">Lore</div>
+            <div class="tab active" id="t-status" onclick="switchTab('status')">Stats</div>
+            <div class="tab" id="t-directives" onclick="switchTab('directives')">Directives</div>
+            <div class="tab" id="t-powers" onclick="switchTab('powers')">Library</div>
         </div>
 
         <div id="view-status">
-            <div class="bar-label-row">
-                <span class="label">AP · Action Points</span>
-                <span class="bar-val" id="ap-val">100 / 100</span>
-            </div>
+            <div class="label">Action Points <span id="ap-val" style="float:right;">--/--</span></div>
             <div class="bar-bg"><div id="bar-ap" class="bar-fill"></div></div>
-            <div class="ap-controls">
-                <button class="ap-btn" onclick="spendAP(25)">- 25 AP</button>
-                <button class="ap-btn" onclick="spendAP(50)">- 50 AP</button>
-                <button class="ap-btn restore" onclick="restoreAP()">RESTORE</button>
-            </div>
+            
+            <div class="label" style="margin-top:15px;">Experience <span id="xp-val" style="float:right;">--/--</span></div>
+            <div class="bar-bg"><div id="bar-xp" class="bar-fill"></div></div>
 
-            <div class="bar-label-row">
-                <span class="label">XP · Experience</span>
-                <span class="bar-val" id="xp-val">0 / 100</span>
-            </div>
-            <div class="bar-bg" style="margin-bottom:16px;"><div id="bar-xp" class="bar-fill"></div></div>
-
-            <div class="stats-row">
-                <div class="stat-card coins">
-                    <span class="label">A-Coins</span>
-                    <div class="stat-value" id="disp-coins">0</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+                <div style="background:rgba(0,0,0,0.4); padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
+                    <div class="label">Evolution Lvl</div>
+                    <div id="disp-lvl" style="font-size:1.8rem; font-family:'Cinzel'; color:var(--neon);">1</div>
                 </div>
-                <div class="stat-card level">
-                    <span class="label">Level</span>
-                    <div class="stat-value" id="disp-lvl">1</div>
+                <div style="background:rgba(0,0,0,0.4); padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
+                    <div class="label">A-Coins</div>
+                    <div id="disp-coins" style="font-size:1.8rem; font-family:'Cinzel'; color:var(--yellow);">0</div>
                 </div>
             </div>
+        </div>
 
-            <div class="inv-header">
-                <div class="inv-label">Inventory</div>
-                <button class="btn btn-sm" style="border-color:rgba(0,242,255,0.3); color:var(--text); font-size:0.6rem; padding:4px 10px;" onclick="addInvSlot()">+ SLOT</button>
-            </div>
-            <div id="disp-inv"></div>
+        <div id="view-directives" class="hidden">
+            <div id="quest-list"></div>
         </div>
 
         <div id="view-powers" class="hidden">
-            <div style="margin-bottom:20px;">
-                <span class="label">Abilities</span>
-                <div class="power-list" id="powers-list"></div>
-                <div class="add-row">
-                    <input id="new-power" placeholder="Add power...">
-                    <button class="btn btn-sm" onclick="addPower()">ADD</button>
-                </div>
-            </div>
-            <div style="border-top:1px solid var(--border); padding-top:20px;">
-                <span class="label" style="color:var(--gm);">Techniques</span>
-                <div class="power-list" id="techs-list"></div>
-                <div class="add-row">
-                    <input id="new-tech" placeholder="Add technique...">
-                    <button class="btn btn-sm btn-gm" onclick="addTech()">ADD</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-lore" class="hidden">
-            <div class="archive-scroll" id="archive-list"></div>
+            <div id="powers-container"></div>
         </div>
     </div>
 
-    <!-- GM PANEL -->
-    <div id="gm" class="hidden">
-        <div class="gm-header">
-            <div class="gm-dot"></div>
-            <h2>GM WORKSHOP</h2>
+    <!-- GM ACCESS ROOT -->
+    <div id="gm" class="hidden" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:25px; overflow-y:auto;">
+        <h2 style="font-family:'Cinzel'; color:var(--gm); margin-bottom:20px;">SYSTEM ARCHITECT</h2>
+        
+        <div style="background:var(--panel); border:1px solid var(--border-gm); padding:15px; border-radius:10px; margin-bottom:15px;">
+            <div class="label" style="color:var(--gm);">Issue Directive</div>
+            <input id="q-title" placeholder="Quest Title">
+            <textarea id="q-desc" placeholder="Quest Details"></textarea>
+            <input id="q-rew" placeholder="Rewards (XP/Coins)">
+            <select id="q-diff">
+                <option value="normal">Normal</option>
+                <option value="hard">Hard</option>
+                <option value="evolution">Evolution</option>
+            </select>
+            <button class="btn btn-gm" onclick="addQuest()">Broadcast</button>
         </div>
 
-        <div class="gm-section">
-            <div class="gm-section-title">Live Unit Registry</div>
-            <table id="unit-table">
-                <thead>
-                    <tr><th>ID</th><th>LVL</th><th>XP</th><th>COINS</th><th>AP</th></tr>
-                </thead>
-                <tbody id="unit-table-body"></tbody>
-            </table>
+        <div style="background:var(--panel); border:1px solid var(--border-gm); padding:15px; border-radius:10px; margin-bottom:15px;">
+            <div class="label" style="color:var(--gm);">Dispense Rewards</div>
+            <input id="rew-id" placeholder="Unit ID">
+            <input id="rew-xp" type="number" placeholder="+ XP">
+            <input id="rew-coins" type="number" placeholder="+ Coins">
+            <button class="btn btn-gm" onclick="dispenseRewards()">Confirm Registry</button>
         </div>
 
-        <div class="gm-section">
-            <div class="gm-section-title">System Architect · AI Console</div>
-            <div style="display:flex; gap:6px; margin-bottom:10px;">
-                <input id="openrouter-key" type="password" placeholder="OpenRouter API Key" style="border-color: var(--border-gm); margin-bottom:0; flex:1;">
-                <button class="btn btn-sm btn-danger" onclick="forgetKey()">FORGET</button>
-            </div>
-            <div class="ai-terminal" id="ai-convo">
-                <div class="ai-msg">System Architect: Memory nodes active. Awaiting input.</div>
-            </div>
-            <textarea id="gm-input" placeholder="Paste session log or discuss quest..."></textarea>
-            <button class="btn btn-gm" onclick="aiAction()">Consult System Architect</button>
-        </div>
-
-        <div class="gm-section">
-            <div class="gm-section-title">Balance Dispenser</div>
-            <input id="rew-id" placeholder="Player ID">
-            <div class="dispenser-grid">
-                <input id="rew-c" placeholder="+ Coins">
-                <input id="rew-x" placeholder="+ XP">
-            </div>
-            <button class="btn btn-gm" style="margin-top:10px;" onclick="dispense()">Update Database</button>
-        </div>
-
-        <div class="gm-section">
-            <div class="gm-section-title">Inventory Editor</div>
-            <input id="inv-player-id" placeholder="Player ID">
-            <div id="gm-inv-slots" class="gm-inv-grid"></div>
-            <div style="display:flex; gap:6px; margin-top:8px;">
-                <button class="btn btn-sm btn-gm" onclick="loadGMInv()">LOAD</button>
-                <button class="btn btn-sm" onclick="saveGMInv()">SAVE</button>
-            </div>
-        </div>
-
-        <div class="gm-section">
-            <div class="gm-section-title">Change GM Password</div>
-            <input id="gm-old-pass" type="password" placeholder="Current password">
-            <input id="gm-new-pass" type="password" placeholder="New password">
-            <input id="gm-new-pass2" type="password" placeholder="Confirm new password">
-            <button class="btn btn-gm" onclick="changeGMPassword()">UPDATE PASSWORD</button>
-        </div>
-
-        <button class="exit-btn" onclick="closeGM()">[ EXIT TERMINAL ]</button>
+        <button class="btn" style="margin-top:20px; border-color:#334155; color:#334155;" onclick="document.getElementById('gm').classList.add('hidden')">Exit Terminal</button>
     </div>
+
+    <div style="text-align:center; margin-top:30px; font-size:0.5rem; color:#1e293b; cursor:pointer;" onclick="enterGM()">[ACCESS_ROOT]</div>
 </div>
 
 <script>
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyDzoLb_qVYgsWAmIdPtdkSJSnXX-IyeQC0",
         databaseURL: "https://aetheriumsystem-f9a6c-default-rtdb.firebaseio.com",
@@ -725,281 +213,136 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let currentID = "";
-    let pendingLoreDraft = "";
-    let broadcastListener = null;
 
-    // --- NOTIFICATION HANDLER ---
-    function sendSystemNotification(title, message, isGM = false) {
-        // 1. In-app toast
-        toast(`${title}: ${message}`, isGM);
-
-        // 2. Browser notification
-        if (Notification.permission === 'granted') {
-            new Notification(title, {
-                body: message,
-                icon: "https://cdn-icons-png.flaticon.com/512/5822/5822082.png"
-            });
-        }
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function toast(msg, isGM = false) {
-        const el = document.getElementById('toast');
-        const msgEl = document.getElementById('toast-msg');
-        msgEl.innerText = msg;
-        el.className = isGM ? 'show gm-toast' : 'show';
-        clearTimeout(el._t);
-        el._t = setTimeout(() => el.className = isGM ? 'gm-toast' : '', 3000);
-    }
-
+    // --- CORE SYNC LOGIC ---
     function sync() {
-        const id = document.getElementById('user-id').value.trim();
+        const idField = document.getElementById('user-id');
+        const id = idField.value.trim().toLowerCase();
         if (!id) return;
-        
-        // Request Browser Permission
-        if (Notification.permission !== 'granted') {
-            Notification.requestPermission();
-        }
+        currentID = id;
 
-        if (id.startsWith('sk-or')) {
-            toast("ERROR: Invalid Unit ID format.", true);
-            return;
-        }
+        toast("INITIALIZING LINK...");
 
-        const playerRef = db.ref('players/' + id);
-        playerRef.once('value', snap => {
+        db.ref('players/' + id).once('value').then(snap => {
             if (snap.exists()) {
-                currentID = id;
-                // ALERT: Login
-                sendSystemNotification("SYSTEM ONLINE", `Unit ${id} has successfully linked.`);
-                startListener(id);
+                // FORCE UI SWAP
+                document.getElementById('auth').style.display = 'none';
+                document.getElementById('dash').classList.remove('hidden');
+                document.getElementById('dash').style.display = 'block';
+                
+                updateUI(snap.val());
+                toast("SYSTEM ONLINE: Unit " + id.toUpperCase() + " has successfully linked.");
             } else {
-                const newPlayerData = {
-                    lvl: 1, exp: 0, coins: 0,
-                    ap: 100, maxAp: 100,
-                    inventory: [], powers: [], techniques: []
-                };
-                playerRef.set(newPlayerData).then(() => {
-                    currentID = id;
-                    sendSystemNotification("REGISTRY CREATED", `New Unit ${id} initialized.`);
-                    startListener(id);
-                });
+                // Create New Unit Registry
+                db.ref('players/' + id).set({
+                    lvl: 1, exp: 0, coins: 0, ap: 100, maxAp: 100,
+                    powers: [
+                        { name: "Slot 1 Power", stage: "Basic", sealed: false },
+                        { name: "Slot 2 Power", stage: "Basic", sealed: false },
+                        { name: "Sealed Power 3", stage: "Sealed", sealed: true },
+                        { name: "Sealed Power 4", stage: "Sealed", sealed: true }
+                    ]
+                }).then(() => location.reload());
             }
         });
 
-        db.ref('worldData/lore').on('value', snap => {
-            const list = document.getElementById('archive-list');
-            list.innerHTML = '';
-            if (!snap.exists()) { list.innerHTML = '<div class="empty-state">NO LORE ENTRIES</div>'; return; }
-            snap.forEach(entry => {
-                const data = entry.val();
-                list.innerHTML += `<div class="lore-entry"><div class="lore-meta">${data.date}</div><div class="lore-text">${data.text}</div></div>`;
+        // Real-time listener
+        db.ref('players/' + id).on('value', snap => {
+            if (snap.exists()) updateUI(snap.val());
+        });
+
+        // Quest Sync
+        db.ref('worldData/quests').on('value', snap => {
+            const container = document.getElementById('quest-list');
+            container.innerHTML = '';
+            if (!snap.exists()) return;
+            snap.forEach(q => {
+                const data = q.val();
+                container.innerHTML += `
+                    <div class="quest-card ${data.diff}">
+                        <div class="quest-title">${data.title}</div>
+                        <div class="quest-desc">${data.desc}</div>
+                        <div class="quest-rew">AWARD: ${data.reward}</div>
+                        <button onclick="deleteQuest('${q.key}')" class="btn btn-gm" style="margin-top:10px; padding:4px; font-size:0.5rem; width:auto;">Clear</button>
+                    </div>`;
             });
         });
-        loadGMTable();
-    }
-
-    function startListener(id) {
-        db.ref('players/' + id).on('value', snap => {
-            if(snap.exists()) {
-                updateUI(snap.val());
-                document.getElementById('auth').classList.add('hidden');
-                document.getElementById('dash').classList.remove('hidden');
-            }
-        });
-    }
-
-    function logout() {
-        db.ref('players/' + currentID).off();
-        currentID = "";
-        document.getElementById('dash').classList.add('hidden');
-        document.getElementById('auth').classList.remove('hidden');
-        toast("Unit disconnected");
     }
 
     function updateUI(data) {
-        document.getElementById('disp-name').innerText = currentID.toUpperCase();
-        document.getElementById('disp-lvl').innerText = data.lvl;
-        document.getElementById('disp-coins').innerText = data.coins;
-        const maxAp = data.maxAp || 100;
-        const ap = data.ap !== undefined ? data.ap : 100;
-        document.getElementById('bar-ap').style.width = (ap / maxAp * 100) + "%";
-        document.getElementById('ap-val').innerText = `${ap} / ${maxAp}`;
-        const req = Math.floor(100 * Math.pow(1.2, data.lvl - 1));
-        document.getElementById('bar-xp').style.width = (data.exp / req * 100) + "%";
-        document.getElementById('xp-val').innerText = `${Math.floor(data.exp)} / ${req}`;
-
-        const inv = document.getElementById('disp-inv');
-        inv.innerHTML = '';
-        const items = data.inventory || [];
-        items.forEach((item, i) => {
-            if (!item) inv.innerHTML += `<div class="inv-slot empty" onclick="editSlot(${i})"></div>`;
-            else inv.innerHTML += `<div class="inv-slot" onclick="editSlot(${i})">${item}<span class="del-slot" onclick="event.stopPropagation(); deleteSlot(${i})">✕</span></div>`;
-        });
-        if (items.length < 16) inv.innerHTML += `<div class="inv-slot empty" onclick="addInvSlot()"></div>`;
-
-        const pList = document.getElementById('powers-list');
-        pList.innerHTML = '';
-        (data.powers || []).forEach((p, i) => {
-            pList.innerHTML += `<div class="power-item"><span>${p}</span><span class="del-btn" onclick="deletePower(${i})">✕</span></div>`;
-        });
-        const tList = document.getElementById('techs-list');
-        tList.innerHTML = '';
-        (data.techniques || []).forEach((t, i) => {
-            tList.innerHTML += `<div class="power-item technique"><span>${t}</span><span class="del-btn" onclick="deleteTech(${i})">✕</span></div>`;
-        });
-    }
-
-    function spendAP(amount) {
-        db.ref('players/' + currentID).transaction(p => {
-            if (p) p.ap = Math.max(0, (p.ap || 0) - amount);
-            return p;
-        });
-    }
-
-    function restoreAP() {
-        db.ref('players/' + currentID).transaction(p => {
-            if (p) p.ap = p.maxAp || 100;
-            return p;
-        });
-    }
-
-    function addInvSlot() {
-        const name = prompt("Item name:");
-        if (name === null) return;
-        db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.inventory = p.inventory || []; p.inventory.push(name); }
-            return p;
-        });
-    }
-
-    function deleteSlot(i) {
-        db.ref('players/' + currentID).transaction(p => {
-            if (p && p.inventory) p.inventory.splice(i, 1);
-            return p;
-        });
-    }
-
-    function addPower() {
-        const val = document.getElementById('new-power').value.trim();
-        if (!val) return;
-        db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.powers = p.powers || []; p.powers.push(val); }
-            return p;
-        }, () => document.getElementById('new-power').value = '');
-    }
-
-    function addTech() {
-        const val = document.getElementById('new-tech').value.trim();
-        if (!val) return;
-        db.ref('players/' + currentID).transaction(p => {
-            if (p) { p.techniques = p.techniques || []; p.techniques.push(val); }
-            return p;
-        }, () => document.getElementById('new-tech').value = '');
-    }
-
-    function loadGMTable() {
-        db.ref('players').on('value', snap => {
-            const tbody = document.getElementById('unit-table-body');
-            tbody.innerHTML = "";
-            snap.forEach(child => {
-                const childKey = child.key;
-                if (childKey.includes('OpenRouter') || childKey.startsWith('sk-or-v1')) {
-                    return; 
-                }
-                const p = child.val();
-                tbody.innerHTML += `<tr><td>${childKey}</td><td>${p.lvl}</td><td>${Math.floor(p.exp)}</td><td>${p.coins}</td><td>${p.ap || 100}</td></tr>`;
-            });
-        });
-    }
-
-    async function aiAction() {
-        const key = document.getElementById('openrouter-key').value;
-        const input = document.getElementById('gm-input').value;
-        const chat = document.getElementById('ai-convo');
-        if (!key || !input) return;
-        chat.innerHTML += `<div class="gm-msg">> ${input}</div>`;
         try {
-            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    model: "openrouter/free",
-                    messages: [{role: "system", content: "You are the System Architect of Aetherium tower RPG."}, {role: "user", content: input}]
-                })
-            });
-            const data = await res.json();
-            const aiText = data.choices[0].message.content;
-            chat.innerHTML += `<div class="ai-msg">${aiText}<br><button class="btn btn-gm btn-push" onclick="finalizeQuest('${aiText.replace(/'/g, "\\'").replace(/\n/g, " ")}')">Archive Lore</button></div>`;
-        } catch (e) { chat.innerHTML += `<div class="ai-msg" style="color:red;">Error: ${e.message}</div>`; }
-        document.getElementById('gm-input').value = '';
+            document.getElementById('disp-name').innerText = currentID.toUpperCase();
+            document.getElementById('disp-lvl').innerText = data.lvl || 1;
+            document.getElementById('disp-coins').innerText = data.coins || 0;
+            
+            const ap = data.ap || 100;
+            const maxAp = data.maxAp || 100;
+            document.getElementById('bar-ap').style.width = (ap / maxAp * 100) + "%";
+            document.getElementById('ap-val').innerText = ap + "/" + maxAp;
+
+            const req = Math.floor(100 * Math.pow(1.2, (data.lvl || 1) - 1));
+            const exp = data.exp || 0;
+            document.getElementById('bar-xp').style.width = (exp / req * 100) + "%";
+            document.getElementById('xp-val').innerText = Math.floor(exp) + "/" + req;
+
+            const pContainer = document.getElementById('powers-container');
+            if (pContainer && data.powers) {
+                pContainer.innerHTML = '';
+                data.powers.forEach(p => {
+                    pContainer.innerHTML += `
+                        <div class="power-slot ${p.sealed ? 'sealed' : ''}">
+                            <div>
+                                <div class="power-meta">${p.stage}</div>
+                                <div class="power-name">${p.name}</div>
+                            </div>
+                            ${p.sealed ? '<div class="seal-tag">SEALED</div>' : ''}
+                        </div>`;
+                });
+            }
+        } catch (e) { console.log("UI Sync Error:", e); }
     }
 
-    function finalizeQuest(txt) {
-        db.ref('worldData/lore').push({ text: txt, date: new Date().toLocaleDateString() });
-        toast("Lore archived", true);
+    function addQuest() {
+        const title = document.getElementById('q-title').value;
+        const desc = document.getElementById('q-desc').value;
+        const reward = document.getElementById('q-rew').value;
+        const diff = document.getElementById('q-diff').value;
+        if (title) db.ref('worldData/quests').push({ title, desc, reward, diff });
     }
 
-    // --- DISPENSE WITH NOTIFICATIONS ---
-    function dispense() {
-        const id = document.getElementById('rew-id').value;
-        const c = parseInt(document.getElementById('rew-c').value) || 0;
-        const x = parseInt(document.getElementById('rew-x').value) || 0;
-        if(!id) return;
+    function deleteQuest(key) { db.ref('worldData/quests/' + key).remove(); }
 
+    function dispenseRewards() {
+        const id = document.getElementById('rew-id').value.toLowerCase();
+        const xp = parseInt(document.getElementById('rew-xp').value) || 0;
+        const coins = parseInt(document.getElementById('rew-coins').value) || 0;
         db.ref('players/' + id).transaction(p => {
             if (p) {
-                const oldLvl = p.lvl;
-                p.coins += c; p.exp += x;
+                p.exp += xp;
+                p.coins += coins;
                 let req = Math.floor(100 * Math.pow(1.2, p.lvl - 1));
                 while (p.exp >= req) { p.exp -= req; p.lvl++; req = Math.floor(100 * Math.pow(1.2, p.lvl - 1)); }
-                
-                // ALERT: Database Update
-                sendSystemNotification("DATABASE UPDATED", `Unit ${id} received ${c} Coins and ${x} XP.`, true);
-
-                // ALERT: Level Up
-                if (p.lvl > oldLvl) {
-                    sendSystemNotification("LEVEL UP", `Unit ${id} reached Level ${p.lvl}!`, true);
-                }
-            } return p;
+            }
+            return p;
         });
-    }
-
-    function loadGMInv() {
-        const id = document.getElementById('inv-player-id').value;
-        db.ref('players/' + id + '/inventory').once('value', snap => {
-            const grid = document.getElementById('gm-inv-slots');
-            grid.innerHTML = '';
-            const items = snap.val() || [];
-            for(let i=0; i<8; i++) grid.innerHTML += `<input class="gm-inv-input" id="gm-slot-${i}" value="${items[i] || ''}" placeholder="Slot ${i+1}">`;
-        });
-    }
-
-    function saveGMInv() {
-        const id = document.getElementById('inv-player-id').value;
-        const items = Array.from(document.querySelectorAll('.gm-inv-input')).map(s => s.value);
-        db.ref('players/' + id + '/inventory').set(items).then(() => toast("Inv saved", true));
+        toast("REGISTRY UPDATED");
     }
 
     function switchTab(tab) {
-        ['status', 'powers', 'lore'].forEach(t => {
+        ['status', 'directives', 'powers'].forEach(t => {
             document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
             document.getElementById('t-' + t).classList.toggle('active', t === tab);
         });
     }
 
-    function enterGM() {
-        const pass = localStorage.getItem('gm_pass') || '1234';
-        if (prompt("ACCESS:") === pass) {
-            document.getElementById('gm').classList.remove('hidden');
-            document.getElementById('openrouter-key').value = localStorage.getItem('or_key') || '';
-        }
-    }
-
-    function closeGM() { document.getElementById('gm').classList.add('hidden'); }
-
-    function forgetKey() { localStorage.removeItem('or_key'); document.getElementById('openrouter-key').value = ''; }
-
-    document.getElementById('openrouter-key').addEventListener('change', e => localStorage.setItem('or_key', e.target.value));
+    function enterGM() { if (prompt("SYSTEM KEY:") === "1234") document.getElementById('gm').classList.remove('hidden'); }
 </script>
 </body>
 </html>
